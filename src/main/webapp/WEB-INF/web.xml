@@ -18,14 +18,18 @@
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
-			<param-value>com.globomart.microservices</param-value>
+			<param-value>com.globomart.microservices.service</param-value>
 		</init-param>
+		<init-param>
+		<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+		<param-value>true</param-value>
+	</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
 	<servlet-mapping>
 		<servlet-name>RESTful Jersey Hello World Service</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
+		<url-pattern>/globomart/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>

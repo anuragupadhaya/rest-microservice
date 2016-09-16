@@ -1,4 +1,4 @@
-package com.globomart.microservices.resources;
+package com.globomart.microservices.object;
 
 public class Product {
 	private String id;
