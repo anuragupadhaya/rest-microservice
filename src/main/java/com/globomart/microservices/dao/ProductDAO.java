@@ -1,6 +1,7 @@
 package com.globomart.microservices.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,17 +12,26 @@ import com.globomart.microservices.object.ProductType;
 public class ProductDAO {
 	private Set<Product> productCatalogue;
 
-	private Map<ProductType, Product> mapProductType;
+	private Map<ProductType, List<Product>> mapProductType;
 
-	public ProductDAO(Set<Product> productCatalogue, Map<ProductType, Product> mapProductType) {
+	public ProductDAO(Set<Product> productCatalogue, Map<ProductType, List<Product>> mapProductType) {
 		this.productCatalogue = productCatalogue;
 		this.mapProductType = mapProductType;
-		regenerateMapProductType();
 	}
 
 	private void regenerateMapProductType() {
+		mapProductType = new HashMap<ProductType, List<Product>>();
+		List<Product> productList;
 		for (Product p : productCatalogue) {
-			mapProductType.put(p.getType(), p);
+			if (!mapProductType.containsKey(p.getType())) {
+				productList = new ArrayList<Product>();
+				productList.add(p);
+				mapProductType.put(p.getType(), productList);
+			} else {
+				productList = mapProductType.get(p.getType());
+				productList.add(p);
+				mapProductType.put(p.getType(), productList);
+			}
 		}
 
 	}
@@ -36,7 +46,8 @@ public class ProductDAO {
 
 		for (ProductType productType : mapProductType.keySet()) {
 			if (productType.equals(type)) {
-				productList.add(mapProductType.get(productType));
+				for (Product p : mapProductType.get(productType))
+					productList.add(p);
 			}
 		}
 		return productList;
@@ -44,6 +55,7 @@ public class ProductDAO {
 
 	public void removeProduct(Product p) {
 		productCatalogue.remove(p);
+		regenerateMapProductType();
 	}
 
 }

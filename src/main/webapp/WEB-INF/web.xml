@@ -4,14 +4,6 @@
 
 <web-app>
 	<display-name>RESTful Jersey Hello World</display-name>
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
-	</welcome-file-list>
 
 	<servlet>
 		<servlet-name>RESTful Jersey Hello World Service</servlet-name>

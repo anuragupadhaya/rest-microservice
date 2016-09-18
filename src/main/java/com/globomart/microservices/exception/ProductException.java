@@ -8,8 +8,8 @@ public class ProductException extends Exception {
 
 	private Product product;
 
-	public ProductException() {
-		super();
+	public ProductException(String message) {
+		super(message);
 	}
 
 	public ProductException(String message, Product product) {
@@ -24,7 +24,7 @@ public class ProductException extends Exception {
 
 	@Override
 	public String getMessage() {
-		return super.getMessage() + "for Product" + product;
+		return super.getMessage() + ":" + product;
 	}
 
 	@Override

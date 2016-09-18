@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,62 +23,117 @@ import com.globomart.microservices.dao.ProductDAO;
 import com.globomart.microservices.exception.ProductException;
 import com.globomart.microservices.object.Product;
 import com.globomart.microservices.object.ProductType;
+import com.sun.jersey.spi.resource.Singleton;
 
-@Path("/microservice")
+@Path("/product")
+@Singleton
 public class ProductCatalogueService {
 	private final static Logger logger = Logger.getLogger(ProductCatalogueService.class);
 
-	private Set<Product> productCatalogue = new HashSet<Product>();
+	private Set<Product> productCatalogue;
 
-	private Map<ProductType, Product> mapProductType = new HashMap<ProductType, Product>();
+	private ProductDAO dao;
 
-	private ProductDAO dao = new ProductDAO(productCatalogue, mapProductType);
-	
+	public ProductCatalogueService() {
+		this.productCatalogue = new HashSet<Product>();
+		this.dao = new ProductDAO(this.productCatalogue, new HashMap<ProductType, List<Product>>());
+	}
+
 	@POST
 	@Path("/add")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addProduct(Product product) {
-
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addProduct(@FormParam("id") String id, @FormParam("name") String name,
+			@FormParam("type") String type, @FormParam("price") Integer price) {
+		Response response = null;
+		Product product = null;
 		try {
-			if (product == null || productCatalogue.contains(product)) {
+			ProductType productType = ProductType.valueOf(type.toUpperCase());
+			product = new Product(id, name, productType, price);
+			if (id == null || name == null || type == null || price == null || product == null
+					|| productCatalogue.contains(product)) {
 				throw new ProductException("Invalid product", product);
 			} else {
 				dao.addProduct(product);
+				response = Response.status(Response.Status.CREATED).entity(product).build();
 			}
 		} catch (ProductException e) {
-			logger.error(e.getMessage());
+			response = Response.status(Response.Status.BAD_REQUEST).build();
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+			response = Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		return Response.status(201).entity("Product added").build();
+		return response;
 	}
 
-	public List<Product> getProducts(ProductType type) {
+	@GET
+	@Path("/search/{type}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Product> getProducts(@PathParam("type") String type) {
+		ProductType productType = ProductType.valueOf(type.toUpperCase());
 		List<Product> productList = new ArrayList<Product>();
 		try {
-			productList = dao.getProducts(type);
+			productList = dao.getProducts(productType);
 			if (productList == null) {
-				// fix the exception constructor here
-				throw new ProductException();
+				throw new ProductException("Invalid Product Type:" + type);
 			}
-
 		} catch (ProductException e) {
-			logger.warn(e.getMessage());
+			e.printStackTrace();
 		}
 		return productList;
 	}
 
-	public void removeProduct(String id) {
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProductByID(@PathParam("id") String id) {
+		Response response = null;
+		Product product = null;
 		try {
+			if (id == null) {
+				throw new ProductException("Invalid Product ID:" + id);
+			}
 			for (Product p : productCatalogue) {
-				if (p.getId() == id) {
-					dao.removeProduct(p);
-					return;
+				if (p.getId().equals(id)) {
+					product = p;
+					response = Response.status(Response.Status.OK).entity(product).build();
+					break;
 				}
 			}
-			// fix the exception constructor here
-			throw new ProductException();
+			if (product == null) {
+				throw new ProductException("Invalid Product ID:" + id);
+			}
 		} catch (ProductException e) {
+			response = Response.status(Response.Status.NOT_FOUND).build();
 			e.printStackTrace();
 		}
+		return response;
+	}
+
+	@POST
+	@Path("/remove/{id}")
+	public Response removeProduct(@PathParam("id") String id) {
+		Response response = null;
+		try {
+			if (id == null) {
+				throw new ProductException("Invalid Product ID:" + id);
+			}
+
+			response = Response.status(Response.Status.NOT_FOUND).build();
+
+			for (Product p : productCatalogue) {
+				if (p.getId().equals(id)) {
+					dao.removeProduct(p);
+					response = Response.status(Response.Status.OK).build();
+					break;
+				}
+			}
+		} catch (ProductException e) {
+			response = Response.status(Response.Status.NOT_FOUND).build();
+			e.printStackTrace();
+		}
+		return response;
 
 	}
 }

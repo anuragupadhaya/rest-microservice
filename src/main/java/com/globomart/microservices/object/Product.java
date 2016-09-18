@@ -4,7 +4,14 @@ public class Product {
 	private String id;
 	private String name;
 	private ProductType type;
-	private int price;
+	private Integer price;
+
+	public Product(String id, String name, ProductType type, Integer price) {
+		this.id = id;
+		this.name = name;
+		this.type = type;
+		this.price = price;
+	}
 
 	public String getId() {
 		return id;
@@ -30,11 +37,11 @@ public class Product {
 		this.type = type;
 	}
 
-	public int getPrice() {
+	public Integer getPrice() {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public void setPrice(Integer price) {
 		this.price = price;
 	}
 
@@ -45,7 +52,7 @@ public class Product {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode();
+		return id.hashCode();
 	}
 
 	@Override
