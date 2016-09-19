@@ -18,17 +18,20 @@ public class TestProductCatalogueService extends TestCase {
 	}
 
 	public final void testGetProducts() {
+		ProductCatalogueClient.invokeSearchProductByType("ELECTRONICS");
+		assertEquals(Response.Status.OK, ProductCatalogueClient.response.getResponseStatus());
+	}
+
+	public final void testGetProductByID() {
 		ProductCatalogueClient.invokeGetProductByProductID("2");
 
 		assertEquals(Response.Status.OK, ProductCatalogueClient.response.getResponseStatus());
 	}
 
-	public final void testGetProductByID() {
-		fail("Not yet implemented"); // TODO
-	}
-
 	public final void testRemoveProduct() {
-		fail("Not yet implemented"); // TODO
+		ProductCatalogueClient.invokeRemoveProduct("2");
+
+		assertEquals(Response.Status.OK, ProductCatalogueClient.response.getResponseStatus());
 	}
 
 }

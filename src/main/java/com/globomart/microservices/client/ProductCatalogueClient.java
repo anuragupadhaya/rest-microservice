@@ -14,12 +14,37 @@ public class ProductCatalogueClient {
 	static Client client;
 	static WebResource webResource;
 
-	public static void invokeRemoveProduct() {
+	public static void invokeRemoveProduct(String id) {
+		try {
+			client = Client.create();
+			webResource = client.resource(url + "remove/" + id);
+			response = webResource.post(ClientResponse.class);
+
+			if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+				throw new RuntimeException("Failed:" + response.getStatus());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
-	public static void invokeSearchProductByTYpe() {
+	public static void invokeSearchProductByType(String type) {
+		try {
+			client = Client.create();
+			webResource = client.resource(url + "search/" + type);
+			response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
+			if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+				throw new RuntimeException("Failed:" + response.getStatus());
+			}
+
+			String output = response.getEntity(String.class);
+
+			System.out.println("Output:" + output);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void invokeAddProduct(String json) {
