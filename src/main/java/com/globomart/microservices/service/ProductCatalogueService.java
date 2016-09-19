@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,19 +39,17 @@ public class ProductCatalogueService {
 
 	@POST
 	@Path("/add")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addProduct(@FormParam("id") String id, @FormParam("name") String name,
-			@FormParam("type") String type, @FormParam("price") Integer price) {
+	public Response addProduct(Product input) {
 		Response response = null;
 		Product product = null;
 		try {
-			ProductType productType = ProductType.valueOf(type.toUpperCase());
-			product = new Product(id, name, productType, price);
-			if (id == null || name == null || type == null || price == null || product == null
+			if (input.getId() == null || input.getName() == null || input.getType() == null || input.getPrice() == null
 					|| productCatalogue.contains(product)) {
 				throw new ProductException("Invalid product", product);
 			} else {
+				product = new Product(input.getId(), input.getName(), input.getType(), input.getPrice());
 				dao.addProduct(product);
 				response = Response.status(Response.Status.CREATED).entity(product).build();
 			}

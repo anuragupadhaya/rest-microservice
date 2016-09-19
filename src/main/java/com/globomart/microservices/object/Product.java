@@ -5,6 +5,10 @@ public class Product {
 	private String name;
 	private ProductType type;
 	private Integer price;
+	
+	public Product(){
+		
+	}
 
 	public Product(String id, String name, ProductType type, Integer price) {
 		this.id = id;
